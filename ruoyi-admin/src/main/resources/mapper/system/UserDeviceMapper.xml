@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.UserDeviceMapper">
+    
+    <resultMap type="UserDevice" id="UserDeviceResult">
+        <result property="userId"    column="user_id"    />
+        <result property="username"    column="username"    />
+        <result property="phone"    column="phone"    />
+        <result property="controllableDevice"    column="controllable_device"    />
+    </resultMap>
+
+    <sql id="selectUserDeviceVo">
+        select user_id, username, phone, controllable_device from user_device
+    </sql>
+
+    <select id="selectUserDeviceList" parameterType="UserDevice" resultMap="UserDeviceResult">
+        <include refid="selectUserDeviceVo"/>
+        <where>  
+            <if test="username != null  and username != ''"> and username like concat('%', #{username}, '%')</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="controllableDevice != null  and controllableDevice != ''"> and controllable_device = #{controllableDevice}</if>
+        </where>
+    </select>
+    
+    <select id="selectUserDeviceByUserId" parameterType="Long" resultMap="UserDeviceResult">
+        <include refid="selectUserDeviceVo"/>
+        where user_id = #{userId}
+    </select>
+
+    <insert id="insertUserDevice" parameterType="UserDevice" useGeneratedKeys="true" keyProperty="userId">
+        insert into user_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="username != null and username != ''">username,</if>
+            <if test="phone != null and phone != ''">phone,</if>
+            <if test="controllableDevice != null and controllableDevice != ''">controllable_device,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="username != null and username != ''">#{username},</if>
+            <if test="phone != null and phone != ''">#{phone},</if>
+            <if test="controllableDevice != null and controllableDevice != ''">#{controllableDevice},</if>
+         </trim>
+    </insert>
+
+    <update id="updateUserDevice" parameterType="UserDevice">
+        update user_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="username != null and username != ''">username = #{username},</if>
+            <if test="phone != null and phone != ''">phone = #{phone},</if>
+            <if test="controllableDevice != null and controllableDevice != ''">controllable_device = #{controllableDevice},</if>
+        </trim>
+        where user_id = #{userId}
+    </update>
+
+    <delete id="deleteUserDeviceByUserId" parameterType="Long">
+        delete from user_device where user_id = #{userId}
+    </delete>
+
+    <delete id="deleteUserDeviceByUserIds" parameterType="String">
+        delete from user_device where user_id in 
+        <foreach item="userId" collection="array" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+</mapper>
